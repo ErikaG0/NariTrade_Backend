@@ -1,0 +1,80 @@
+intalar nodejs.
+comando [npm init --yes]
+________________________________________________________
+soporta peticions HTTP
+comando intalacion [npm install express --save]
+Comando [npm i -D nodemon]
+en la parte de scripts ["dev": "nodemon index.js"]
+Para ejecutarlo
+[npm run dev]
+______________________________________________________
+Mecanismo servidores web para hacer peticiones protocolo HTPP (HYPERTEX TRANSFER PROTOCL)
+GET -> oye dame info de algo
+HEAD -> identico al get pero sin el cuerpo de la respuesta 
+POST ->envio algo nuevo (creacion)
+PUT -> reeplazar esto completamente
+DELETE ->borra un recurso en especifico
+CONNECT -> establece un tunel hacia el servidor 
+OPTIONS ->El servidor responde con qué métodos están permitidos (GET, POST, etc.).
+TRACE -> “repite lo que dije, para ver si me escuchaste bien”.
+PATCH -> cambia solo una parte de esto
+______________________________________________________
+comando [npm i mongoose --save] #instala el componente de mongoose acceder a la DB
+comando [npm i dotenv --save]
+________________________________________________
+
+bcrypt : encriptar cadenas de caracteres
+[npm i bcrypt --save]
+Contraseña: "miContraseña123"
+Sal (salt): "a1b2c3d4"
+Resultado -> "miContraseña123a1b2c3d4"
+bcrypt aplica el algoritmo de hashing 
+$2a$10$wKpBz9q2wzmtFtsN6cFOzC7dNYz1L4v0g9TlePqHr0BaL.nf5J0tC
+_________________________________________________
+JWT json web token establecer el acceso a una api
+comando [npm i jsonwebtoken --save]
+_________________________________________________
+[Authorization: Bearer <token>]
+cuando se hace una peticion protegidda. el servidor requiere 
+saber quien la esta haciendo:
+
+Authorization: dice “aquí te mando una autorización”.
+Bearer: significa “portador”, o sea “tengo un token que me identifica”.
+<token>: es el JWT que se generó en el login.
+_______________________________________________________
+
+JWT JSON WEB token
+codigo pequemo contiene informacion codificada y firmada.
+se usa para autenticar usuarios sin guardar sessiones en el servidor.
+ESTRUCTURA
+xxxxx.yyyyy.zzzzz
+xxxxx: Header – dice qué tipo de token es y con qué algoritmo está firmado.
+yyyyy: Payload – la información, como userId, correo, rol, etc.
+zzzzz: Firma – generada con una clave secreta para verificar que no fue alterado.
+FUNCIONAMIENTO
+1.usuario hace login -> servidor crea y le envia JWT
+2.se guarda en cliente localStorage. Cookie
+3.en cada solicitud que haga el user envia token
+4.el sever verificar la firma y codificar el contenido.
+5.si es valido lo deja pasar
+___________________________________________________
+EXPESS  VS JWT
+Dónde vive la sesión	
+En el servidor (RAM o base de datos)	
+En el cliente (token guardado)
+Escalabilidad	
+❌ Difícil (hay que compartir sesiones)	
+✅ Fácil (no hay estado que compartir)
+Verificación de sesión	
+✅ Consulta servidor	
+✅ Solo verifica token localmente
+Logout	
+✅ Elimina sesión	
+❌ No puede “borrar” el token (usa blacklist)
+Seguridad	
+✅ Muy seguro en servidor	
+✅ Seguro si el token es bien manejado
+Requiere cookies	
+✅ Sí, normalmente	
+❌ No, usa headers
+____________________________________________
