@@ -45,7 +45,7 @@ router.get("/search/:id", isAdmin, async (req,res) =>{
         .catch((error) => res.json({message:error}))
 })
 
-//info user login
+//info basica del  user login
 router.get("/search", activeSession, async (req,res) =>{
     const  id = req.user.userId;
     userSchema

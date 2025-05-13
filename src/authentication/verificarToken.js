@@ -19,8 +19,11 @@ function activeSession(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        console.log(decoded);
+        //ver el id rol
+        req.userId = decoded.userId;
+        req.userRol = decoded.rol;
+        console.log("idUser" + decoded.userId);
+        console.log("rolUser"+decoded.rol);
         next();
     } catch (err) {
         return res.status(401).json({ message: "Token inválido o expirado" });

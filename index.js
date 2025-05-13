@@ -4,6 +4,7 @@ const app = express();//instancia de aplicacion
 const port = 3000;//define el puerto
 const userRoutes = require("./src/routers/usuario");
 const sessionRoutes = require("./src/routers/session");
+const articuloRoutes = require("./src/routers/articulo");
 const mongoose = require("mongoose");
 //carga varible de entorno del archivo clave mongo
 require('dotenv').config();
@@ -15,10 +16,10 @@ app.use(express.json()); //leer datos enviado JSON
 
 
 //todas las rutas que empiecen por /api seran manejadas por 
+
+app.use("/api/items", articuloRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api", sessionRoutes);
-
-
 
 
 //Conexion BD
