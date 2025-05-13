@@ -48,4 +48,27 @@ router.get("/mis",activeSession, async(req,res) =>{
       .catch((error) => res.json({message:error}))
 })
 
+//actualizar item user
+router.put("/update/:id", activeSession, async (req,res) => {
+   const { idItem } = req.params;
+   const {titulo,descri,categoria,precio,fechaUpdate,estado}  = req.body;
+   articulosShema
+      .updateOne(
+         {_idItem: idItem},
+         {$set:{titulo,descri,categoria,precio,fechaUpdate,estado}}
+      )
+      .then((data) => res.json(data))
+      .catch((error) => res.json({mesaage:error}))      
+})
+
+
+//delete
+router.delete("/update/:id" ,isAdmin, async (req,res) => {
+    const { id } = req.params;
+    articulosShema
+        .findByIdAndDelete(id)
+        .then((data) => {res.json(data)})
+        .catch((error) => {res.json({message:error})})
+})
+
 module.exports = router;
