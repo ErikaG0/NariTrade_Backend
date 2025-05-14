@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const userSchema = require("../models/usuario");
+
 const { activeSession } = require("../authentication/verificarToken");
 const { isAdmin } = require("../authentication/validarRol");
 
-//Creacion Truequero o Admin
+//Creacion Truequero 
 router.post("/SignUp", async (req, res) => {
     try {
         const { correo , numDocumento } = req.body;
@@ -104,6 +105,9 @@ router.delete("/delete/:id",activeSession,isAdmin, async (req,res) => {
         .then((data) => {res.json(data)})
         .catch((error) => {res.json({message:error})})
 })
+
+
+
 
 //exporta las rutas para que puedan ser utilizadas
 module.exports = router;

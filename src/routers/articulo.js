@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userSchema = require("../models/usuario");
 const articulosShema = require("../models/articulo");
+const truequeSchema = require("../models/comercio");
 const { activeSession } = require("../authentication/verificarToken");
 const { isAdmin } = require("../authentication/validarRol");
 const { default: mongoose } = require("mongoose");
@@ -12,62 +13,109 @@ router.post("/new", activeSession, async (req, res) => {
    try {
       const id = req.userId;
       const rol = req.userRol;
-      console.log(" endpoint new items ", id,rol);
-        
+      console.log(" endpoint new items ", id, rol);
+
       const newArticulo = new articulosShema({
          ...req.body,//operados ... spread toma los campos dentro de 
          //req body y los desempaqueta para incluirlos
          idPerson: id,
          rolPerson: rol,
-       
+
       })
 
-      const saveArticulo = await  newArticulo.save();
+      const saveArticulo = await newArticulo.save();
       res.status(200).json(saveArticulo);
-   }catch(error){
-      res.status(500).json({message:error.message});
+   } catch (error) {
+      res.status(500).json({ message: error.message });
    }
-    
+
 
 });
 
 //listar todos los articulos (valido rol Admin)
-router.get("/all", activeSession, isAdmin, async (req,res) =>{
+router.get("/all", activeSession, isAdmin, async (req, res) => {
    articulosShema.find()
       .then((data) => res.json(data))
-      .catch((error) => res.json({message:error}));
+      .catch((error) => res.json({ message: error }));
 })
 
 //listar por articulos del user logueado
-router.get("/mis",activeSession, async(req,res) =>{
+router.get("/mis", activeSession, async (req, res) => {
    const id = req.userId;
-   console.log(id+ " lista articulos cliente")
+   console.log(id + " lista articulos cliente")
    articulosShema
-      .find({idPerson:id})
+      .find({ idPerson: id })
       .then((data) => res.json(data))
-      .catch((error) => res.json({message:error}))
+      .catch((error) => res.json({ message: error }))
 })
 
 //actualizar items
-router.put("/update/:id", activeSession, async (req,res) => {
+router.put("/update/:id", activeSession, async (req, res) => {
    const { idItem } = req.params;
-   const {titulo,descri,categoria,precio,fechaUpdate,estado}  = req.body;
+   const { titulo, descri, categoria, precio, fechaUpdate, estado } = req.body;
    articulosShema
       .updateOne(
-         {_idItem: idItem},
-         {$set:{titulo,descri,categoria,precio,fechaUpdate,estado}}
+         { _idItem: idItem },
+         { $set: { titulo, descri, categoria, precio, fechaUpdate, estado } }
       )
       .then((data) => res.json(data))
-      .catch((error) => res.json({mesaage:error}))      
+      .catch((error) => res.json({ mesaage: error }))
 })
 
 //delete  (valido rol Admin)
-router.delete("/delete/:id", activeSession, isAdmin, async (req,res) => {
-    const { id } = req.params;
-    articulosShema
-        .findByIdAndDelete(id)
-        .then((data) => {res.json(data)})
-        .catch((error) => {res.json({message:error})})
+router.delete("/delete/:id", activeSession, isAdmin, async (req, res) => {
+   const { id } = req.params;
+   articulosShema
+      .findByIdAndDelete(id)
+      .then((data) => { res.json(data) })
+      .catch((error) => { res.json({ message: error }) })
 })
+
+
+//ver solicitudes de trueque por userio logueado
+router.get("/misSolicitudes/", activeSession, async (req, res) => {
+   const idUser = req.userId;
+   console.log("userSolicitudes => " + idUser)
+
+   try {
+      const data = await truequeSchema.find({ "idProductoQuiere.idPerson": idUser });
+
+      // Obtener todos los Ids de las personas que ofertan
+      const idPersonaOferta = data.map(d => d.idPersonOferta);
+
+      // Traer toda la info de las personas
+      const personasOfertantes = await userSchema.find({
+         _id: { $in: idPersonaOferta }
+      });
+
+      // Empaquetar respuesta por cada trueque
+      const solicitudes = data.map((trueque) => {
+         const persona = personasOfertantes.find(p => p._id.toString() === trueque.idPersonOferta);
+
+         return {
+            productoOfertado: {
+               titulo: trueque.idProductoOferta.titulo,
+               descri: trueque.idProductoOferta.descri,
+               categoria: trueque.idProductoOferta.categoria,
+               //img: trueque.idProductoOferta.img
+               fechaSolicitud:trueque.fechaSolicitud
+            },
+            personaQueOferta: {
+               nombre: persona?.nombre,
+               apellido: persona?.apellido,
+               correo: persona?.correo,
+               celular: persona?.celular
+            }
+         };
+      });
+
+      res.status(200).json({ solicitudes });
+
+   } catch (error) {
+      res.status(500).json({ message: error.message });
+   }
+
+})
+
 
 module.exports = router;

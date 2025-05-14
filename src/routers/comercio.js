@@ -26,20 +26,27 @@ router.get("/items", activeSession, async (req, res) => {
 })
 
 //solicitud trueque
-router.post("/solicitar/:idProductoQuier/:idProductoOferta", activeSession, async (req, res) => {
+router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async (req, res) => {
     const id = req.userId;
     const nombreSolicita = req.userNombre;
-    const { idProductoQuiere, idProductoOferta } = req.body;
+    
+    const { idProductoQuiere, idProductoOferta } = req.params;
+    
 
     try {
+        console.log(idProductoOferta , idProductoQuiere)
+
+        if (!idProductoQuiere) {
+            return res.status(400).json({ message: "No encontrado produ quiere" });
+        } if(!idProductoOferta){
+            return res.status(400).json({ message: "No encontrado produ oferta" });
+        }
+
+
         //buscar productos
         const produQuiere = await articulosShema.findById(idProductoQuiere);
         const produOferta = await articulosShema.findById(idProductoOferta);
-
-        if (!produQuiere || !produOferta) {
-            return res.status(400).json({ message: "No encontrado" });
-        }
-
+        
         //valida precio
         const precioQ = produQuiere.precio;
         const precioO = produOferta.precio;
@@ -60,6 +67,8 @@ router.post("/solicitar/:idProductoQuier/:idProductoOferta", activeSession, asyn
 
     } catch (error) { res.status(500).json({ message: error.message }) }
 })
+
+
 
 
 module.exports = router;

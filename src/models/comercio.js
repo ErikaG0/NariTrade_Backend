@@ -5,8 +5,8 @@ const truequeSchema= mongoose.Schema({
 
     idPersonOferta:{type:String,required:true},
     nombrePersona:{type:String, require:true},
-    idProductoQuiere:{type:String,required:true},
-    idProductoOferta:{type:String,required:true},
+    idProductoQuiere:{ type: Object },
+    idProductoOferta: { type: Object },
     fechaSolicitud:{type:Date, default:Date.now, required:false},
     
 
