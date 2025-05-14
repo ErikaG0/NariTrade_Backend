@@ -5,39 +5,36 @@ const { activeSession } = require("../authentication/verificarToken");
 const { isAdmin } = require("../authentication/validarRol");
 
 //Creacion Truequero o Admin
-router.post("/new", async (req, res) => {
+router.post("/SignUp", async (req, res) => {
     try {
         const { correo , numDocumento } = req.body;
-
-        // validar si esiste
+         // validar si existe correo documento
         const userCorreo = await userSchema.findOne({ correo});
         const userDocument = await userSchema.findOne({numDocumento});
         if (userCorreo || userDocument) {
             return res.status(400).json({ message: "Usuario ya existe" });
         }
-        
         // Crearlo sino
         const newUser = new userSchema(req.body);
         newUser.clave = await newUser.encryptClave(newUser.clave);
         const savedUser = await newUser.save();
-
         res.json(savedUser);
+
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
 
-
-//listar usuarios
+//listar todos los usuarios (solo sirve si el que lo consulta es ADMIN)
 router.get("/all", activeSession ,isAdmin, async (req, res) => {
     userSchema.find()
         .then((data) => res.json(data))
         .catch((error) => res.json({message:error}));
 })
 
-//buscar por id trae info
-router.get("/search/:id", isAdmin, async (req,res) =>{
+//buscar por id a un usuario (solo sirve si el que lo consulta es ADMIN)
+router.get("/search/:id", activeSession, isAdmin, async (req,res) =>{
     const { id } = req.params;
     userSchema
         .findById(id)
@@ -45,33 +42,35 @@ router.get("/search/:id", isAdmin, async (req,res) =>{
         .catch((error) => res.json({message:error}))
 })
 
-//info basica del  user login
+//trae la info del propio user logueado
 router.get("/search", activeSession, async (req,res) =>{
-    const  id = req.user.userId;
+    const  id = req.userId;
     userSchema
         .findById(id)
         .then((data) => res.json(data))
         .catch((error) => res.json({message:error}))
 })
 
-//update cualquier usuario
-router.put("/update/:id", activeSession, async (req,res) =>{
-    const {id } = req.params;
-    const {nombre,apellido,tipoDocumento,genero,numDocumento,celular,fechaNacimiento,correo,departamento} = req.body;
+//update cualquier usuario (solo sirve si el que lo consulta es ADMIN)
+router.put("/update/:id", activeSession,isAdmin, async (req,res) =>{
+    const { id } = req.params;
+    const {nombre,apellido,tipoDocumento,genero,numDocumento
+        ,celular,fechaNacimiento,correo,departamento} = req.body;
     userSchema
         .updateOne(
             {_id:id},
-            { $set: {nombre,apellido,tipoDocumento,genero,numDocumento,fechaNacimiento,correo,departamento}}
+            { $set: {nombre,apellido,tipoDocumento,genero,
+                numDocumento,fechaNacimiento,correo,departamento}}
         )       
         .then((data) => res.json(data))
         .catch((error) => res.json({message:error}))
 })
 
 
-//update user logueado
+//update para el propio user Logueado
 router.put("/update", activeSession, async (req,res) =>{
     console.log("in");
-    const id = req.user.userId;
+    const id = req.userId;
     console.log(id);
     const {correo,celular,departamento,clave} = req.body;
     
@@ -92,8 +91,9 @@ router.put("/update", activeSession, async (req,res) =>{
 
 })
 
-//delete
-router.delete("/delete/:id" ,isAdmin, async (req,res) => {
+
+//delete user (solo sirve si el que lo consulta es ADMIN)
+router.delete("/delete/:id",activeSession,isAdmin, async (req,res) => {
     const { id } = req.params;
     userSchema
         .findByIdAndDelete(id)

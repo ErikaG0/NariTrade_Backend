@@ -15,11 +15,11 @@ app.use(express.json()); //leer datos enviado JSON
 
 
 
-//todas las rutas que empiecen por /api seran manejadas por 
+//todas las rutas que empiecen por /... seran manejadas por 
 
 app.use("/api/items", articuloRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api", sessionRoutes);
+app.use("/NariTrade/User/", userRoutes);
+app.use("/NariTrade/", sessionRoutes);
 
 
 //Conexion BD

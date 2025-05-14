@@ -12,7 +12,7 @@ router.post("/new", activeSession, async (req, res) => {
    try {
       const id = req.userId;
       const rol = req.userRol;
-      console.log(" endpoint new itemsz", id,rol);
+      console.log(" endpoint new items ", id,rol);
         
       const newArticulo = new articulosShema({
          ...req.body,//operados ... spread toma los campos dentro de 
@@ -31,14 +31,14 @@ router.post("/new", activeSession, async (req, res) => {
 
 });
 
-//listar todos los articulos admin
+//listar todos los articulos (valido rol Admin)
 router.get("/all", activeSession, isAdmin, async (req,res) =>{
    articulosShema.find()
       .then((data) => res.json(data))
       .catch((error) => res.json({message:error}));
 })
 
-//listar por articulos user logueado
+//listar por articulos del user logueado
 router.get("/mis",activeSession, async(req,res) =>{
    const id = req.userId;
    console.log(id+ " lista articulos cliente")
@@ -48,7 +48,7 @@ router.get("/mis",activeSession, async(req,res) =>{
       .catch((error) => res.json({message:error}))
 })
 
-//actualizar item user
+//actualizar items
 router.put("/update/:id", activeSession, async (req,res) => {
    const { idItem } = req.params;
    const {titulo,descri,categoria,precio,fechaUpdate,estado}  = req.body;
@@ -62,8 +62,8 @@ router.put("/update/:id", activeSession, async (req,res) => {
 })
 
 
-//delete
-router.delete("/update/:id" ,isAdmin, async (req,res) => {
+//delete  (valido rol Admin)
+router.delete("/update/:id", activeSession, isAdmin, async (req,res) => {
     const { id } = req.params;
     articulosShema
         .findByIdAndDelete(id)
