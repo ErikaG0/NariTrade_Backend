@@ -61,9 +61,8 @@ router.put("/update/:id", activeSession, async (req,res) => {
       .catch((error) => res.json({mesaage:error}))      
 })
 
-
 //delete  (valido rol Admin)
-router.delete("/update/:id", activeSession, isAdmin, async (req,res) => {
+router.delete("/delete/:id", activeSession, isAdmin, async (req,res) => {
     const { id } = req.params;
     articulosShema
         .findByIdAndDelete(id)

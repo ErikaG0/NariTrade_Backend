@@ -38,16 +38,15 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
+//El token ingresa balckList hasta que expira.
 router.post("/logout", activeSession, async (req, res) => {
     console.log("entraaa")
     //se extrae del token el Bearer
     const token = req.headers.authorization?.split(" ")[1];
     console.log("logout token " +  token)
     if (token) {
-       
-        addToBlacklist(token);
-        
+         addToBlacklist(token);
+     
     }
     res.json({ message: "Sesión cerrada correctamente" });
 });

@@ -22,6 +22,7 @@ function activeSession(req, res, next) {
         //ver el id rol
         req.userId = decoded.userId;
         req.userRol = decoded.rol;
+        req.userNombre = decoded.nombre;
         console.log("idUser" + decoded.userId);
         console.log("rolUser"+decoded.rol);
         next();

@@ -52,7 +52,11 @@ router.get("/search", activeSession, async (req,res) =>{
 })
 
 //update cualquier usuario (solo sirve si el que lo consulta es ADMIN)
-router.put("/update/:id", activeSession,isAdmin, async (req,res) =>{
+router.put("/update/:id", activeSession,isAdmin, async (req,res) =>{router.get("/all", activeSession, isAdmin, async (req,res) =>{
+   articulosShema.find()
+      .then((data) => res.json(data))
+      .catch((error) => res.json({message:error}));
+})
     const { id } = req.params;
     const {nombre,apellido,tipoDocumento,genero,numDocumento
         ,celular,fechaNacimiento,correo,departamento} = req.body;
@@ -69,9 +73,9 @@ router.put("/update/:id", activeSession,isAdmin, async (req,res) =>{
 
 //update para el propio user Logueado
 router.put("/update", activeSession, async (req,res) =>{
-    console.log("in");
+    console.log("ingreso logueo");
     const id = req.userId;
-    console.log(id);
+    
     const {correo,celular,departamento,clave} = req.body;
     
     try{
