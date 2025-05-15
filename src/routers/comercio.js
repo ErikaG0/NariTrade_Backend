@@ -39,9 +39,9 @@ router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, asy
         console.log(idProductoOferta , idProductoQuiere)
 
         if (!idProductoQuiere) {
-            return res.status(400).json({ message: "No encontrado produ quiere" });
+            return res.status(400).json({ message: "No se encontro producto para intercambiar" });
         } if(!idProductoOferta){
-            return res.status(400).json({ message: "No encontrado produ oferta" });
+            return res.status(400).json({ message: "No encontro producto para ofertar" });
         }
 
 
@@ -70,7 +70,7 @@ router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, asy
     } catch (error) { res.status(500).json({ message: error.message }) }
 })
 
-
+//ver mis ofrecimiento a trueques
 
 
 module.exports = router;

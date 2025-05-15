@@ -184,4 +184,60 @@ router.put("/aceptaTrueque/:id", activeSession, async (req, res) => {
    }
 
 })
+
+//ver mis ofrecimiento a trueques (donde YO ofrezco algo a otro))
+router.get("/misPropuestas/", activeSession, async (req, res) => {
+   const idUser = req.userId;
+   console.log("userPropuestas => " + idUser);
+
+   try {
+      // Buscar trueques donde el usuario es quien hace la oferta
+      const data = await truequeSchema.find({ idPersonOferta: idUser });
+      console.log("Trueques encontrados:", data);
+
+      // Obtener IDs de las personas a quienes les están haciendo ofertas
+      const idPersonasReceptoras = data.map(d => d.idProductoQuiere.idPerson);
+
+      // Traer info de esas personas
+      const personasReceptoras = await userSchema.find({
+         _id: { $in: idPersonasReceptoras }
+      });
+
+      // Empaquetar respuesta
+      const propuestas = data.map((trueque) => {
+         const persona = personasReceptoras.find(p => p._id.toString() === trueque.idProductoQuiere.idPerson);
+
+         return {
+            trueque: trueque._id,
+            productoDeseado: {
+               titulo: trueque.idProductoQuiere.titulo,
+               descri: trueque.idProductoQuiere.descri,
+               categoria: trueque.idProductoQuiere.categoria,
+               estado: trueque.idProductoQuiere.estado,
+            },
+            productoOfrecido: {
+               titulo: trueque.idProductoOferta.titulo,
+               descri: trueque.idProductoOferta.descri,
+               categoria: trueque.idProductoOferta.categoria,
+               estado: trueque.idProductoOferta.estado,
+               fechaSolicitud: trueque.fechaSolicitud
+            },
+            personaPropone: {
+               nombre: persona?.nombre,
+               apellido: persona?.apellido,
+               correo: persona?.correo,
+               celular: persona?.celular
+            }
+         };
+      });
+
+      res.status(200).json({ propuestas });
+
+   } catch (error) {
+      console.error("Error al obtener propuestas:", error);
+      res.status(500).json({ message: error.message });
+   }
+});
+
+
 module.exports = router;
