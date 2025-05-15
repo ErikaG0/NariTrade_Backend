@@ -7,7 +7,9 @@ const { activeSession } = require("../authentication/verificarToken");
 const { isAdmin } = require("../authentication/validarRol");
 const { default: mongoose } = require("mongoose");
 
-//comercio lista todos los  items ccon estado publicado
+
+
+//comercio lista todos los  items con estado publicado
 router.get("/items", activeSession, async (req, res) => {
     try {
         //filtro solo mostrar los que tengan el estado publicado y excluir -

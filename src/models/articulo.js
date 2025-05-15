@@ -19,6 +19,7 @@ const articulosSchema = mongoose.Schema({
     idPerson:{type:String,required:true},
     rolPerson:{type:String,required:true},
     fechaUpdate:{type:Date, default:Date.now, required:false}
+    
 
 });
 

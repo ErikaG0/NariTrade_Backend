@@ -8,7 +8,8 @@ const truequeSchema= mongoose.Schema({
     idProductoQuiere:{ type: Object },
     idProductoOferta: { type: Object },
     fechaSolicitud:{type:Date, default:Date.now, required:false},
-    
+    estado:{type:String, enum:['Pendiente','Aceptado', 'Rechazado'],default:'Pendiente'},
+    fechaAceta:{type:Date, require:false}
 
 })
 
