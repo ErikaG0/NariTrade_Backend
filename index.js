@@ -1,7 +1,7 @@
 //importar librerias
 const express = require('express');//crear y configurar el servidor web
 const app = express();//instancia de aplicacion
-const port = 3010;//define el puerto
+const port = 3070;//define el puerto
 const userRoutes = require("./src/routers/usuario");
 const sessionRoutes = require("./src/routers/session");
 const articuloRoutes = require("./src/routers/articulo");

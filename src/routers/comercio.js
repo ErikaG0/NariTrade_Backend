@@ -19,7 +19,7 @@ router.get("/items", activeSession, async (req, res) => {
         const items = await articulosShema.find(
             { estado: "Publicado", idPerson: { $ne: idLogueado } }, //$ne exclusion
             {
-                _id: 0, fechaUpdate: 0, rolPerson: 0,
+                rolPerson: 0,
                 __v: 0
             }
         );
@@ -48,40 +48,38 @@ router.get("/items", activeSession, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 
-})
+});
 
 //solicitud trueque
 router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async (req, res) => {
-    console.log("Ingresa solicitud trueque")
+    console.log("Ingresa solicitud trueque");
     const id = req.userId;
     const nombreSolicita = req.userNombre;
-
     const { idProductoQuiere, idProductoOferta } = req.params;
 
     try {
-        // Producto que el usuario desea
         const produQuiere = await articulosShema.findById(idProductoQuiere);
-        // Producto que el usuario está ofreciendo (debe ser suyo)
+        if (!produQuiere) {
+            return res.status(400).json({ message: "No se encontró producto que se desea" });
+        }
+
         const produOferta = await articulosShema.findOne({ _id: idProductoOferta, idPerson: id });
-        //busca truque ya existe
+        if (!produOferta) {
+            return res.status(400).json({ message: "Solicitud inválida: el producto ofrecido no es tuyo o no existe" });
+        }
+
         const trueque = await truequeSchema.findOne({
             "idProductoQuiere._id": produQuiere._id,
             "idProductoOferta._id": produOferta._id
         });
-
-        if (!produQuiere) {
-            return res.status(400).json({ message: "No se encontro producto para intercambiar" });
-        } if (!produOferta) {
-            return res.status(400).json({ message: "Solcitud Invalida" });
-        } if (trueque) {
+        if (trueque) {
             return res.status(400).json({ message: "Trueque ya existe" });
         }
-        //valida precio
+
         const precioQ = produQuiere.precio;
         const precioO = produOferta.precio;
-
         if ((precioQ - precioO) >= (precioQ * 0.35)) {
-            return res.status(400).json({ message: "La diferencia es superior  al 35%" });
+            return res.status(400).json({ message: "La diferencia es superior al 35%" });
         }
 
         const nuevaSolicitud = new truequeSchema({
@@ -89,13 +87,15 @@ router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, asy
             nombrePersona: nombreSolicita,
             idProductoQuiere: produQuiere,
             idProductoOferta: produOferta,
-        })
+        });
         const save = await nuevaSolicitud.save();
-        res.status(200).json(save)
+        res.status(200).json(save);
 
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
-    } catch (error) { res.status(500).json({ message: error.message }) }
-})
 
 
 

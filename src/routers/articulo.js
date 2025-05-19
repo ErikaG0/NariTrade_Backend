@@ -61,15 +61,15 @@ router.get("/mis", activeSession, async (req, res) => {
 
 //actualizar items
 router.put("/update/:id", activeSession, async (req, res) => {
-   const { idItem } = req.params;
-   const { } = req.body;
+   const { id } = req.params;
+   const { titulo, descri, categoria, precio} = req.body;
    articulosSchema
       .updateOne(
-         { _idItem: idItem },
+         { _id: id },
          { $set: { titulo, descri, categoria, precio } }
       )
       .then((data) => res.json(data))
-      .catch((error) => res.json({ mesaage: error }))
+      .catch((error) => res.json({ message: error }))
 })
 
 //eliminar  (valido rol Admin)
@@ -101,7 +101,7 @@ router.put("/updateBloqueado/:id", activeSession, isAdmin, async (req, res) => {
       res.status(500).json({ message: error.message });
    }
 });
-//desbloque lo deja en publicado nuevamente
+//desbloque lo deja en publicado nuevamente admin
 router.put("/updateDesbloqueado/:id", activeSession, isAdmin, async (req, res) => {
    const { id } = req.params;
 

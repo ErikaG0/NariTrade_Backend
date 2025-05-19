@@ -108,7 +108,5 @@ router.delete("/delete/:id",activeSession,isAdmin, async (req,res) => {
 })
 
 
-
-
 //exporta las rutas para que puedan ser utilizadas
 module.exports = router;
