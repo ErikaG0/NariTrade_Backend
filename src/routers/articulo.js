@@ -13,23 +13,28 @@ router.post("/new", activeSession, async (req, res) => {
    try {
       const id = req.userId;
       const rol = req.userRol;
-      console.log(" endpoint new items ", id, rol);
+      console.log(" endpoint new items para la persona ", id, rol);
+      const { titulo } = req.body;
+
+      //valida que un usuario no cree multiples veces el mismo articulo
+      const tituloArti = await articulosSchema.findOne({ titulo: titulo, idPerson: id });
+      if (tituloArti) {
+         return res.status(400).json({ message: "Producto ya existe" });
+      }
 
       const newArticulo = new articulosSchema({
-         ...req.body,//operados ... spread toma los campos dentro de 
+         ...req.body,//operador ... spread toma los campos dentro de 
          //req body y los desempaqueta para incluirlos
          idPerson: id,
          rolPerson: rol,
 
-      })
+      });
 
       const saveArticulo = await newArticulo.save();
       res.status(200).json(saveArticulo);
    } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(501).json({ message: error.message });
    }
-
-
 });
 
 //listar todos los articulos (valido rol Admin)
@@ -52,7 +57,7 @@ router.get("/mis", activeSession, async (req, res) => {
 //actualizar items
 router.put("/update/:id", activeSession, async (req, res) => {
    const { idItem } = req.params;
-   const { titulo, descri, categoria, precio } = req.body;
+   const { } = req.body;
    articulosSchema
       .updateOne(
          { _idItem: idItem },
@@ -72,7 +77,7 @@ router.delete("/delete/:id", activeSession, isAdmin, async (req, res) => {
 })
 
 
-//ver solicitudes de trueque por usuario logueado
+//ver solicitudes de trueque por usuario logueado  F
 router.get("/misSolicitudes/", activeSession, async (req, res) => {
    const idUser = req.userId;
    console.log("userSolicitudes => " + idUser)
@@ -108,7 +113,7 @@ router.get("/misSolicitudes/", activeSession, async (req, res) => {
                //img: trueque.idProductoOferta.img
                fechaSolicitud: trueque.fechaSolicitud
             },
-            personaQueOferta: {
+            personaaQueOferta: {
                nombre: persona?.nombre,
                apellido: persona?.apellido,
                correo: persona?.correo,
@@ -125,7 +130,7 @@ router.get("/misSolicitudes/", activeSession, async (req, res) => {
 
 })
 
-//aceptar oferta requiere el id del trueque
+//aceptar oferta requiere el id del trueque  F
 router.put("/aceptaTrueque/:id", activeSession, async (req, res) => {
 
    const { id } = req.params;
@@ -154,11 +159,11 @@ router.put("/aceptaTrueque/:id", activeSession, async (req, res) => {
       //cambia el estado del trueque  y se agrega el campo fecha
       await truequeSchema.updateOne(
          { _id: id },
-         { $set: { estado: "Aceptado" , fechaAcepta: Date.now()} }
+         { $set: { estado: "Aceptado", fechaAcepta: Date.now() } }
       )
 
 
-   
+
       const truequesConEseProducto = await truequeSchema.find({
          "idProductoQuiere._id": idTrueque.idProductoQuiere._id,
          _id: { $ne: id }  // excluye el trueque aceptado
@@ -185,7 +190,7 @@ router.put("/aceptaTrueque/:id", activeSession, async (req, res) => {
 
 })
 
-//ver mis ofrecimiento a trueques (donde YO ofrezco algo a otro))
+//ver mis ofrecimiento a trueques (donde YO ofrezco algo a otro))  F
 router.get("/misPropuestas/", activeSession, async (req, res) => {
    const idUser = req.userId;
    console.log("userPropuestas => " + idUser);
@@ -222,7 +227,7 @@ router.get("/misPropuestas/", activeSession, async (req, res) => {
                estado: trueque.idProductoOferta.estado,
                fechaSolicitud: trueque.fechaSolicitud
             },
-            personaPropone: {
+            personaAlaQueSePropone: {
                nombre: persona?.nombre,
                apellido: persona?.apellido,
                correo: persona?.correo,

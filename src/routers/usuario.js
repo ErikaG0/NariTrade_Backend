@@ -7,6 +7,7 @@ const { isAdmin } = require("../authentication/validarRol");
 
 //Creacion Truequero 
 router.post("/SignUp", async (req, res) => {
+    console.log("entro creaccion truequero");
     try {
         const { correo , numDocumento } = req.body;
          // validar si existe correo documento

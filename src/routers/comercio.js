@@ -9,18 +9,41 @@ const { default: mongoose } = require("mongoose");
 
 
 
-//comercio lista todos los  items con estado publicado
+//comercio listar productos
 router.get("/items", activeSession, async (req, res) => {
+    const idLogueado = req.userId;
+
     try {
-        //filtro solo mostrar los que tengan el estado publicado y excluir -
+
+        //filtro solo mostrar los que tengan el estado publicado y que no sean nuestros propios articulos
         const items = await articulosShema.find(
-            { estado: "Publicado" },
+            { estado: "Publicado", idPerson: { $ne: idLogueado } }, //$ne exclusion
             {
-                _id: 0, precio: 0, fechaUpdate: 0, idPerson: 0, rolPerson: 0,
+                _id: 0, fechaUpdate: 0, rolPerson: 0,
                 __v: 0
             }
         );
-        res.status(200).json(items);
+        //extrae el id propietario item
+        const idOwnerObj = items.map(d => d.idPerson);
+        //busca el propietario 
+        const personasOwer = await userSchema.find({
+            _id: { $in: idOwnerObj }
+        });
+
+        const mapaUsuarios = {};
+        personasOwer.forEach(user => {
+            mapaUsuarios[user._id] = {
+                nombre: user.nombre,
+                apellido: user.apellido
+            };
+        });
+
+         const resultado = items.map(item => ({
+            ...item.toObject(), // Convertir el artículo en objeto plano
+            owner: mapaUsuarios[item.idPerson] || { nombre: "Desconocido", apellido: "-" } // Añadir los datos del dueño
+        }));
+
+        res.status(200).json(resultado);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -31,16 +54,16 @@ router.get("/items", activeSession, async (req, res) => {
 router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async (req, res) => {
     const id = req.userId;
     const nombreSolicita = req.userNombre;
-    
+
     const { idProductoQuiere, idProductoOferta } = req.params;
-    
+
 
     try {
-        console.log(idProductoOferta , idProductoQuiere)
+        console.log(idProductoOferta, idProductoQuiere)
 
         if (!idProductoQuiere) {
             return res.status(400).json({ message: "No se encontro producto para intercambiar" });
-        } if(!idProductoOferta){
+        } if (!idProductoOferta) {
             return res.status(400).json({ message: "No encontro producto para ofertar" });
         }
 
@@ -48,7 +71,7 @@ router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, asy
         //buscar productos
         const produQuiere = await articulosShema.findById(idProductoQuiere);
         const produOferta = await articulosShema.findById(idProductoOferta);
-        
+
         //valida precio
         const precioQ = produQuiere.precio;
         const precioO = produOferta.precio;

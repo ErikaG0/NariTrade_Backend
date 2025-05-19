@@ -31,7 +31,9 @@ router.post("/login", async (req, res) => {
         res.status(200).json({
             message: "Inicio de sesión exitoso",
             token,
-            usuario: user.correo
+            usuario: user.correo,
+            usuarioRol: user.rol
+
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
