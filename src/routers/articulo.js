@@ -72,13 +72,54 @@ router.put("/update/:id", activeSession, async (req, res) => {
       .catch((error) => res.json({ mesaage: error }))
 })
 
-//delete  (valido rol Admin)
-router.delete("/delete/:id", activeSession, isAdmin, async (req, res) => {
+//eliminar  (valido rol Admin)
+router.delete("/delete/:id", activeSession, async (req, res) => {
    const { id } = req.params;
    articulosSchema
       .findByIdAndDelete(id)
       .then((data) => { res.json(data) })
       .catch((error) => { res.json({ message: error }) })
 })
+
+
+//bloquear items admin
+router.put("/updateBloqueado/:id", activeSession, isAdmin, async (req, res) => {
+   const { id } = req.params;
+
+   try {
+      const result = await articulosSchema.updateOne(
+         { _id: id },
+         { $set: { estado: "Bloqueado" } }
+      );
+
+      if (result.matchedCount === 0) {
+         return res.status(404).json({ message: "Artículo no encontrado" });
+      }
+
+      res.status(200).json({ message: "Artículo bloqueado exitosamente" });
+   } catch (error) {
+      res.status(500).json({ message: error.message });
+   }
+});
+//desbloque lo deja en publicado nuevamente
+router.put("/updateDesbloqueado/:id", activeSession, isAdmin, async (req, res) => {
+   const { id } = req.params;
+
+   try {
+      const result = await articulosSchema.updateOne(
+         { _id: id },
+         { $set: { estado: "Publicado" } }
+      );
+
+      if (result.matchedCount === 0) {
+         return res.status(404).json({ message: "Artículo no encontrado" });
+      }
+
+      res.status(200).json({ message: "Artículo Desbloqueado exitosamente" });
+   } catch (error) {
+      res.status(500).json({ message: error.message });
+   }
+});
+
 
 module.exports = router;

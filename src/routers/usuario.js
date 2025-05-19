@@ -73,7 +73,7 @@ router.put("/update/:id", activeSession,isAdmin, async (req,res) =>{router.get("
 })
 
 
-//update para el propio user Logueado
+//update para el propio user Logueado (modifica su informacion basica)
 router.put("/update", activeSession, async (req,res) =>{
     console.log("ingreso logueo");
     const id = req.userId;

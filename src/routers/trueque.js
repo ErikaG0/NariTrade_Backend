@@ -31,13 +31,16 @@ router.get("/misSolicitudes/", activeSession, async (req, res) => {
 
          return {
             trueque: trueque._id,
+            trueque_estado: trueque.estado,
             miproducto: {
+               id: trueque.idProductoQuiere._id,
                titulo: trueque.idProductoQuiere.titulo,
                descri: trueque.idProductoQuiere.descri,
                categoria: trueque.idProductoQuiere.categoria,
                estado: trueque.idProductoQuiere.estado,
             },
             productoOfertado: {
+               id: trueque.idProductoOferta._id,
                titulo: trueque.idProductoOferta.titulo,
                descri: trueque.idProductoOferta.descri,
                categoria: trueque.idProductoOferta.categoria,
@@ -113,6 +116,18 @@ router.put("/aceptaTrueque/:id", activeSession, async (req, res) => {
          }
       );
 
+      await truequeSchema.updateOne(
+         { _id: id },
+         {
+            $set: {
+               "idProductoQuiere.estado": "Truequeado",
+               "idProductoOferta.estado": "Truequeado",
+             
+            }
+         }
+      );
+
+
 
       return res.status(200).json({ message: "Trueque aceptado exitosamente" });
 
@@ -145,7 +160,8 @@ router.get("/misPropuestas/", activeSession, async (req, res) => {
          const persona = personasReceptoras.find(p => p._id.toString() === trueque.idProductoQuiere.idPerson);
 
          return {
-            trueque: trueque._id,
+            trueque_id: trueque._id,
+            trueque_estado: trueque.estado,
             productoDeseado: {
                titulo: trueque.idProductoQuiere.titulo,
                descri: trueque.idProductoQuiere.descri,
