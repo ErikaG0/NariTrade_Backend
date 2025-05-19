@@ -38,7 +38,7 @@ router.get("/items", activeSession, async (req, res) => {
             };
         });
 
-         const resultado = items.map(item => ({
+        const resultado = items.map(item => ({
             ...item.toObject(), // Convertir el artículo en objeto plano
             owner: mapaUsuarios[item.idPerson] || { nombre: "Desconocido", apellido: "-" } // Añadir los datos del dueño
         }));
@@ -52,26 +52,30 @@ router.get("/items", activeSession, async (req, res) => {
 
 //solicitud trueque
 router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async (req, res) => {
+    console.log("Ingresa solicitud trueque")
     const id = req.userId;
     const nombreSolicita = req.userNombre;
 
     const { idProductoQuiere, idProductoOferta } = req.params;
 
-
     try {
-        console.log(idProductoOferta, idProductoQuiere)
-
-        if (!idProductoQuiere) {
-            return res.status(400).json({ message: "No se encontro producto para intercambiar" });
-        } if (!idProductoOferta) {
-            return res.status(400).json({ message: "No encontro producto para ofertar" });
-        }
-
-
-        //buscar productos
+        // Producto que el usuario desea
         const produQuiere = await articulosShema.findById(idProductoQuiere);
-        const produOferta = await articulosShema.findById(idProductoOferta);
+        // Producto que el usuario está ofreciendo (debe ser suyo)
+        const produOferta = await articulosShema.findOne({ _id: idProductoOferta, idPerson: id });
+        //busca truque ya existe
+        const trueque = await truequeSchema.findOne({
+            "idProductoQuiere._id": produQuiere._id,
+            "idProductoOferta._id": produOferta._id
+        });
 
+        if (!produQuiere) {
+            return res.status(400).json({ message: "No se encontro producto para intercambiar" });
+        } if (!produOferta) {
+            return res.status(400).json({ message: "Solcitud Invalida" });
+        } if (trueque) {
+            return res.status(400).json({ message: "Trueque ya existe" });
+        }
         //valida precio
         const precioQ = produQuiere.precio;
         const precioO = produOferta.precio;
@@ -93,7 +97,7 @@ router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, asy
     } catch (error) { res.status(500).json({ message: error.message }) }
 })
 
-//ver mis ofrecimiento a trueques
+
 
 
 module.exports = router;
