@@ -7,6 +7,7 @@ const sessionRoutes = require("./src/routers/session");
 const articuloRoutes = require("./src/routers/articulo");
 const comercioRoutes = require("./src/routers/comercio");
 const truequeRoutes = require("./src/routers/trueque");
+const estadisticaRouter =require("./src/routers/estadistica")
 const mongoose = require("mongoose");
 //carga varible de entorno del archivo clave mongo
 require('dotenv').config();
@@ -18,6 +19,7 @@ app.use(express.json()); //leer datos enviado JSON
 
 
 //todas las rutas que empiecen por /... seran manejadas por 
+app.use("/NariTrade/estadistica/", estadisticaRouter);
 app.use("/NariTrade/trueque/", truequeRoutes);
 app.use("/NariTrade/comercio/", comercioRoutes);
 app.use("/NariTrade/items/", articuloRoutes);
