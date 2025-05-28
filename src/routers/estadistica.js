@@ -7,13 +7,13 @@ const { activeSession } = require("../authentication/verificarToken");
 const { isAdmin } = require("../authentication/validarRol");
 const { default: mongoose } = require("mongoose");
 
-//totla de usuario , articulos  y trueques
-router.get('/dashboard',activeSession, isAdmin, async (req, res) => {
+//total de usuario , articulos  y trueques
+router.get('/dashboard', activeSession, isAdmin, async(req, res) => {
     console.log("entra a estadisticas")
     try {
         const totalUsuarios = await userSchema.countDocuments();
         const totalArticulos = await articulosSchema.countDocuments();
-        const totalTrueques = await  truequeSchema.countDocuments();
+        const totalTrueques = await truequeSchema.countDocuments();
 
         //cantidad de articulo en cada categoria
         const articulosPorCategoria = await articulosSchema.aggregate([

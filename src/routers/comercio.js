@@ -10,14 +10,13 @@ const { default: mongoose } = require("mongoose");
 
 
 //comercio listar productos
-router.get("/items", activeSession, async (req, res) => {
+router.get("/items", activeSession, async(req, res) => {
     const idLogueado = req.userId;
 
     try {
 
         //filtro solo mostrar los que tengan el estado publicado y que no sean nuestros propios articulos
-        const items = await articulosShema.find(
-            { estado: "Publicado", idPerson: { $ne: idLogueado } }, //$ne exclusion
+        const items = await articulosShema.find({ estado: "Publicado", idPerson: { $ne: idLogueado } }, //$ne exclusion
             {
                 rolPerson: 0,
                 __v: 0
@@ -51,7 +50,7 @@ router.get("/items", activeSession, async (req, res) => {
 });
 
 //solicitud trueque
-router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async (req, res) => {
+router.post("/solicitar/:idProductoQuiere/:idProductoOferta", activeSession, async(req, res) => {
     console.log("Ingresa solicitud trueque");
     const id = req.userId;
     const nombreSolicita = req.userNombre;
