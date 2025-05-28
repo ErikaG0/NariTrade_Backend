@@ -37,10 +37,18 @@ router.get("/items", activeSession, async(req, res) => {
             };
         });
 
-        const resultado = items.map(item => ({
-            ...item.toObject(), // Convertir el artículo en objeto plano
-            owner: mapaUsuarios[item.idPerson] || { nombre: "Desconocido", apellido: "-" } // Añadir los datos del dueño
-        }));
+        const resultado = items.map(item => {
+            const obj = item.toObject();
+
+            obj.img = Array.isArray(obj.img) ?
+                obj.img.map(imgStr =>
+                    imgStr.startsWith('data:image') ? imgStr : `data:image/jpeg;base64,${imgStr}`
+                ) : [];
+
+            obj.owner = mapaUsuarios[item.idPerson] || { nombre: "Desconocido", apellido: "-" };
+
+            return obj;
+        });
 
         res.status(200).json(resultado);
     } catch (error) {
